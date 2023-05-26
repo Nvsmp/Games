@@ -1,6 +1,12 @@
 import pygame
 import sys,os,time
 #Teste
+speed = 300
+def update_laser(laser_list):
+    for laserRec in laser_list:
+        laserRec.y -= round(speed*dt)
+        if laserRec.midbottom[1] < 0:
+            laser_list.remove(laserRec)
 
 pygame.init()
 
@@ -9,6 +15,7 @@ pos_y,pos_x  = altura / 2, largura /2
 
 tela = pygame.display.set_mode((largura, altura))
 
+velocidadeDisparo = 50
 
 
 font = pygame.font.Font(os.path.join('assets','Font','Sigmar','Sigmar-Regular.ttf'),16)
@@ -21,8 +28,12 @@ bgR1 = fundo.get_rect(center = ((largura/2,(altura/2))))
 nave = pygame.image.load(os.path.join('assets' ,'img','ship.png')).convert_alpha()
 nave = pygame.transform.scale(nave,(40,40))
 
-naveRec = nave.get_rect(center = (500,500))
+lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
+lasersurf = pygame.transform.scale(lasersurf,(400,400))
 
+naveRec = nave.get_rect(center = (500,500))
+# laserRec = lasersurf.get_rect(midbottom=naveRec.midtop)
+laser_list = []
 pygame.display.set_caption('<- A COBRINHA AKI Q FOFA')
 loop = True
 r,g,b = 0,0,0
@@ -34,9 +45,13 @@ mov_cima = False
 mov_baixo = False
 
 while(loop):
-    relogio.tick(120)
-
+    dt = relogio.tick(120)/1000
+    naveRec.center = pygame.mouse.get_pos()
     for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            laserRec = lasersurf.get_rect(midbottom=naveRec.midtop)
+            laser_list.append(laserRec)
+
         if event.type == pygame.MOUSEBUTTONUP:
             print(f'Tiro em {event.pos}')
 
@@ -77,10 +92,8 @@ while(loop):
     tela.blit(fundo, (0,0))
     tela.blit(nave, naveRec)
     tela.blit(texto,bgR1)
-
-    
-    naveRec.y -= 10
-
+    #laserRec.y -= velocidadeDisparo
+    #tela.blit(lasersurf,laserRec)
     if naveRec.y <= 0:
         naveRec.y = altura - 20
     if naveRec.y >= altura:
@@ -90,12 +103,16 @@ while(loop):
     if naveRec.x >= largura:
         naveRec.x = 0
 
-
+    update_laser(laser_list)
+    for laserRec in laser_list:
+        tela.blit(lasersurf,laserRec)
+        print(laser_list)
+    
     pygame.display.update()
     end = int(round(time.time()*1000))
     
     #print(f'{end-start} ms')
-    relogio.tick(30)
+
 
 
 pygame.quit()
