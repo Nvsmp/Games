@@ -8,6 +8,12 @@ def update_laser(laser_list):
         if laserRec.midbottom[1] < 0:
             laser_list.remove(laserRec)
 
+def displayScore(tela, font):
+    score_text = str(f'S T A R - G A M E {pygame.time.get_ticks()//1000}')
+    texto = font.render(score_text, True, (255,255,255))
+    recText = texto.get_rect(midleft=(30,15))
+    tela.blit(texto, recText)
+
 pygame.init()
 
 largura, altura = 1280,720
@@ -19,8 +25,8 @@ velocidadeDisparo = 50
 
 
 font = pygame.font.Font(os.path.join('assets','Font','Sigmar','Sigmar-Regular.ttf'),16)
-texto = font.render('S T A R - G A M E', True,(65,105,225))
-recText = texto.get_rect(center = (100,10))
+#texto = font.render('S T A R - G A M E', True,(65,105,225))
+#recText = texto.get_rect(center = (100,10))
 fundo = pygame.image.load(os.path.join('assets' ,'img','espaco.png')).convert_alpha()
 
 bgR1 = fundo.get_rect(center = ((largura/2,(altura/2))))
@@ -91,7 +97,8 @@ while(loop):
     start = int(round(time.time()*1000))
     tela.blit(fundo, (0,0))
     tela.blit(nave, naveRec)
-    tela.blit(texto,bgR1)
+    #tela.blit(texto,bgR1)
+    displayScore(tela=tela, font=font)
     #laserRec.y -= velocidadeDisparo
     #tela.blit(lasersurf,laserRec)
     if naveRec.y <= 0:
