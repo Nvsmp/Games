@@ -1,54 +1,64 @@
 import pygame
 import sys,os,time
-#Teste
-speed = 300
+
+pygame.init()
+
+#Funcoes
+#Deleta o tiro
 def update_laser(laser_list):
     for laserRec in laser_list:
         laserRec.y -= round(speed*dt)
         if laserRec.midbottom[1] < 0:
             laser_list.remove(laserRec)
-
+#Pontuacao
 def displayScore(tela, font):
     score_text = str(f'S T A R - G A M E {pygame.time.get_ticks()//1000}')
     texto = font.render(score_text, True, (255,255,255))
     recText = texto.get_rect(midleft=(30,15))
     tela.blit(texto, recText)
 
-pygame.init()
-
-largura, altura = 1280,720
-pos_y,pos_x  = altura / 2, largura /2
-
+#Tela
+pygame.display.set_caption('<- A COBRINHA AKI Q FOFA')
+largura, altura = 1280,720 #FULL HD
 tela = pygame.display.set_mode((largura, altura))
 
-velocidadeDisparo = 50
-
-
-font = pygame.font.Font(os.path.join('assets','Font','Sigmar','Sigmar-Regular.ttf'),16)
-#texto = font.render('S T A R - G A M E', True,(65,105,225))
-#recText = texto.get_rect(center = (100,10))
-fundo = pygame.image.load(os.path.join('assets' ,'img','espaco.png')).convert_alpha()
-
-bgR1 = fundo.get_rect(center = ((largura/2,(altura/2))))
-
-nave = pygame.image.load(os.path.join('assets' ,'img','ship.png')).convert_alpha()
-nave = pygame.transform.scale(nave,(40,40))
-
-lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
-lasersurf = pygame.transform.scale(lasersurf,(400,400))
-
-naveRec = nave.get_rect(center = (500,500))
-# laserRec = lasersurf.get_rect(midbottom=naveRec.midtop)
-laser_list = []
-pygame.display.set_caption('<- A COBRINHA AKI Q FOFA')
+#VARS
 loop = True
 r,g,b = 0,0,0
 relogio = pygame.time.Clock()
 velocidade = 50
+speed = 300 #velocidade tiro
+pos_y,pos_x  = altura / 2, largura /2
+
+#MOVIMENTACAO WASD
 mov_esquerda = False
 mov_direita = False
 mov_cima = False
 mov_baixo = False
+
+#Fonte
+font = pygame.font.Font(os.path.join('assets','Font','Sigmar','Sigmar-Regular.ttf'),16)
+
+#texto = font.render('S T A R - G A M E', True,(65,105,225))
+#recText = texto.get_rect(center = (100,10))
+#bgR1 = fundo.get_rect(center = ((largura/2,(altura/2))))
+
+#Fundo
+fundo = pygame.image.load(os.path.join('assets' ,'img','espaco.png')).convert_alpha()
+
+#Nave
+nave = pygame.image.load(os.path.join('assets' ,'img','ship.png')).convert_alpha()
+nave = pygame.transform.scale(nave,(40,40))
+
+#Disparo da nave
+lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
+lasersurf = pygame.transform.scale(lasersurf,(400,400))
+laser_list = []
+
+#?
+naveRec = nave.get_rect(center = (500,500))
+#laserRec = lasersurf.get_rect(midbottom=naveRec.midtop)
+
 
 while(loop):
     dt = relogio.tick(120)/1000
