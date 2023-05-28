@@ -19,7 +19,7 @@ def display_score(tela, font):
     tela.blit(texto, recText)
 
 #Tela
-pygame.display.set_caption('ACOBRINHA AKI')
+pygame.display.set_caption('Space Shooter')
 largura, altura = 1280,720 #FULL HD
 tela = pygame.display.set_mode((largura, altura))
 
@@ -27,7 +27,7 @@ tela = pygame.display.set_mode((largura, altura))
 loop = True
 r,g,b = 0,0,0
 relogio = pygame.time.Clock()
-velocidade = 50
+velocidade = 10
 speed = 300 #velocidade tiro
 pos_y,pos_x  = altura / 2, largura /2
 
@@ -62,10 +62,17 @@ naveRec = nave.get_rect(center = (500,500))
 
 
 while(loop):
-
     dt = relogio.tick(120)/1000
-    naveRec.center = pygame.mouse.get_pos()
+    #naveRec.center = pygame.mouse.get_pos()
     mousex ,mousey = pygame.mouse.get_pos()
+    vetorMouse = pygame.math.Vector2(mousex,mousey)
+    vetorNave = pygame.math.Vector2(naveRec.x + 20,naveRec.y + 20)
+    vtNaveMouse = vetorMouse - vetorNave
+    angulo = -vtNaveMouse.angle_to(pygame.math.Vector2(0,0)) #?
+    correcaoAngulo = -90
+    angulo = angulo - correcaoAngulo
+    naveRot = pygame.transform.rotate(nave, -angulo)
+    naveRecRot = naveRot.get_rect(center=naveRec.center)
 
     for event in pygame.event.get():
 
@@ -109,11 +116,15 @@ while(loop):
         naveRec.y += velocidade
 
     tela.blit(fundo, (0,0))
-    tela.blit(nave, naveRec)
+    tela.blit(naveRot, naveRecRot)
+    navex = naveRec.x
+    navey = naveRec.y
     #tela.blit(texto,bgR1)
     display_score(tela=tela, font=font)
     #laserRec.y -= velocidadeDisparo
     #tela.blit(lasersurf,laserRec)
+
+    #Nao permite que a nave saia da tela // calibrar
     if naveRec.y <= 0:
         naveRec.y = altura - 20
     if naveRec.y >= altura:
@@ -127,7 +138,7 @@ while(loop):
 
     surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
     pygame.draw.circle(surfaceEscudo, (200, 200, 200, 100), (100, 100), 50)
-    tela.blit(surfaceEscudo, (mousex -100, mousey - 100))
+    tela.blit(surfaceEscudo, (navex -80 , navey - 80))
     #pygame.display.flip()
     #pygame.time.Clock().tick(60)
 
