@@ -55,17 +55,15 @@ nave = pygame.transform.scale(nave,(40,40))
 
 #Disparo da nave
 lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
-lasersurf = pygame.transform.scale(lasersurf,(10,10))
+lasersurf = pygame.transform.scale(lasersurf,(20,20))
 laser_list = []
 
 #?
 naveRec = nave.get_rect(center = (500,500))
-#laserRec = lasersurf.get_rect(midbottom=naveRec.midtop)
-
 
 while(loop):
+    tela.blit(fundo, (0, 0))
     dt = relogio.tick(120)/1000
-    #naveRec.center = pygame.mouse.get_pos()
     mousex ,mousey = pygame.mouse.get_pos()
     vetorMouse = pygame.math.Vector2(mousex,mousey)
     vetorNave = pygame.math.Vector2(naveRec.x + 20,naveRec.y + 20) #
@@ -75,15 +73,14 @@ while(loop):
     angulo = angulo - correcaoAngulo
     naveRot = pygame.transform.rotate(nave, -angulo)
     naveRecRot = naveRot.get_rect(center=naveRec.center)
-
     for event in pygame.event.get():
-
         if event.type == pygame.MOUSEBUTTONDOWN:
+            print(f"X: {naveRecRot.midtop[0]} \nY: {naveRecRot.midtop[1]}")
             vetorAceleracao = vetorMouse - vetorNave
             vetorNormalizado = vetorAceleracao.normalize()
-            laser = Laser(vetorNave, vetorNormalizado )
+            #offset = pygame.math.Vector2(naveRecRot.width / 2, 0).rotate(-vetorNormalizado.as_polar()[1])
+            laser = Laser(vetorNave, vetorNormalizado, angulo)
             laser_list.append(laser)
-
         if event.type == pygame.MOUSEBUTTONUP:
             pass
             #print(f'Tiro em {event.pos}')
@@ -91,7 +88,6 @@ while(loop):
         if event.type == pygame.QUIT:
             loop = False
             sys.exit()
-
         #EVENTO MOVIMENTO (KEYDOWN e KEYUP)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
@@ -120,8 +116,6 @@ while(loop):
     if mov_baixo:
         naveRec.y += velocidade
 
-    tela.blit(fundo, (0,0))
-
     navex = naveRec.x
     navey = naveRec.y
     #tela.blit(texto,bgR1)
@@ -146,7 +140,8 @@ while(loop):
     #pygame.time.Clock().tick(60)
 
     for laserRec in laser_list:
-        tela.blit(lasersurf,laserRec.getVetLaser() )
+        laserRot = pygame.transform.rotate(lasersurf,-laserRec.getAngulo())
+        tela.blit(laserRot,laserRec.getVetLaser() )
         #print(f"Lista: {laser_list}")
     tela.blit(naveRot, naveRecRot)
 
