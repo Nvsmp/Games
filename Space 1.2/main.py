@@ -1,16 +1,18 @@
 import pygame
 import sys,os,time
 from pygame.locals import *
-
+from Classes import Laser
 pygame.init()
 
 #Funcoes
 #Deleta o tiro
 def update_laser(laser_list):
-    for laserRec in laser_list:
-        laserRec.y -= round(speed*dt)
-        if laserRec.midbottom[1] < 0:
-            laser_list.remove(laserRec)
+    for laser in laser_list:
+        velocidade = laser.getVetAceleracao() * laser.getSpeed()
+        pos = laser.getVetLaser() + velocidade
+        laser.setVetPos(pos)
+        if laser.getVetLaser().x < 0 or laser.getVetLaser().x > largura or laser.getVetLaser().y < 0 or laser.getVetLaser().y > altura:
+            laser_list.remove(laser)
 #Pontuacao
 def display_score(tela, font):
     score_text = str(f'S T A R - G A M E {pygame.time.get_ticks()//1000}')
@@ -53,7 +55,7 @@ nave = pygame.transform.scale(nave,(40,40))
 
 #Disparo da nave
 lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
-lasersurf = pygame.transform.scale(lasersurf,(400,400))
+lasersurf = pygame.transform.scale(lasersurf,(10,10))
 laser_list = []
 
 #?
@@ -66,7 +68,7 @@ while(loop):
     #naveRec.center = pygame.mouse.get_pos()
     mousex ,mousey = pygame.mouse.get_pos()
     vetorMouse = pygame.math.Vector2(mousex,mousey)
-    vetorNave = pygame.math.Vector2(naveRec.x + 20,naveRec.y + 20)
+    vetorNave = pygame.math.Vector2(naveRec.x + 20,naveRec.y + 20) #
     vtNaveMouse = vetorMouse - vetorNave
     angulo = -vtNaveMouse.angle_to(pygame.math.Vector2(0,0)) #?
     correcaoAngulo = -90
@@ -77,17 +79,20 @@ while(loop):
     for event in pygame.event.get():
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            laserRec = lasersurf.get_rect(midbottom=naveRec.midtop) #?
-            laser_list.append(laserRec)
+            vetorAceleracao = vetorMouse - vetorNave
+            vetorNormalizado = vetorAceleracao.normalize()
+            laser = Laser(vetorNave, vetorNormalizado )
+            laser_list.append(laser)
 
         if event.type == pygame.MOUSEBUTTONUP:
-            print(f'Tiro em {event.pos}')
+            pass
+            #print(f'Tiro em {event.pos}')
 
         if event.type == pygame.QUIT:
             loop = False
             sys.exit()
 
-        #EVENTO MOVIMENTO (KEYDOWN e KEYUP) | n funciona enquanto posicao do naveRec.center seguir o mouse
+        #EVENTO MOVIMENTO (KEYDOWN e KEYUP)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
                 mov_esquerda = True
@@ -116,7 +121,7 @@ while(loop):
         naveRec.y += velocidade
 
     tela.blit(fundo, (0,0))
-    tela.blit(naveRot, naveRecRot)
+
     navex = naveRec.x
     navey = naveRec.y
     #tela.blit(texto,bgR1)
@@ -134,8 +139,6 @@ while(loop):
     if naveRec.x >= largura:
         naveRec.x = 0
 
-    update_laser(laser_list)
-
     surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
     pygame.draw.circle(surfaceEscudo, (200, 200, 200, 100), (100, 100), 50)
     tela.blit(surfaceEscudo, (navex -80 , navey - 80))
@@ -143,8 +146,11 @@ while(loop):
     #pygame.time.Clock().tick(60)
 
     for laserRec in laser_list:
-        tela.blit(lasersurf,laserRec)
-        print(laser_list)
+        tela.blit(lasersurf,laserRec.getVetLaser() )
+        #print(f"Lista: {laser_list}")
+    tela.blit(naveRot, naveRecRot)
+
+    update_laser(laser_list)
 
     #start = int(round(time.time() * 1000))
     #end = int(round(time.time()*1000))    Pega o "ping" entre as cenas
