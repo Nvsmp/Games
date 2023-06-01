@@ -47,39 +47,56 @@ font = pygame.font.Font(os.path.join('assets','Font','Sigmar','Sigmar-Regular.tt
 #bgR1 = fundo.get_rect(center = ((largura/2,(altura/2))))
 
 #Fundo
-fundo = pygame.image.load(os.path.join('assets' ,'img','espaco.png')).convert_alpha()
+fundo = pygame.image.load(os.path.join('assets', 'img', 'espaco.png')).convert_alpha()
 
 #Nave
-nave = pygame.image.load(os.path.join('assets' ,'img','ship.png')).convert_alpha()
-nave = pygame.transform.scale(nave,(40,40))
+nave = pygame.image.load(os.path.join('assets', 'img', 'ship.png')).convert_alpha()
+scaleNave = (40, 40)
+nave = pygame.transform.scale(nave, scaleNave)
 
 #Disparo da nave
-lasersurf = pygame.image.load(os.path.join("assets","img","laser.png")).convert_alpha()
-lasersurf = pygame.transform.scale(lasersurf,(20,20))
+lasersurf = pygame.image.load(os.path.join("assets", "img", "laser.png")).convert_alpha()
+lasersurf = pygame.transform.scale(lasersurf, (20, 20))
 laser_list = []
 
-#?
-naveRec = nave.get_rect(center = (500,500))
+#Meteoro
+meteoro = pygame.image.load(os.path.join("assets", "img", "meteor.png")).convert_alpha()
+larguraM = 50
+alturaM = 50
+meteoro = pygame.transform.scale(meteoro, (larguraM, alturaM))
+meteoro_list = []
+posMx = 200
+posMy = 200
+meteoroB = True
 
+#Escudo
+surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
+pygame.draw.circle(surfaceEscudo, (200, 200, 200, 50), (100, 100), 40)
+
+#?
+naveRec = nave.get_rect(center=(largura / 2, altura / 2)) #Define o rect padrao no meio da tela
+#meteoroRec = meteoro.get_rect(topleft=(200,200))
 while(loop):
     tela.blit(fundo, (0, 0))
     dt = relogio.tick(120)/1000
-    mousex ,mousey = pygame.mouse.get_pos()
-    vetorMouse = pygame.math.Vector2(mousex,mousey)
-    vetorNave = pygame.math.Vector2(naveRec.x + 20,naveRec.y + 20) #
+    mousex, mousey = pygame.mouse.get_pos()
+    vetorMouse = pygame.math.Vector2(mousex, mousey)
+    vetorNave = pygame.math.Vector2(naveRec.x, naveRec.y)
     vtNaveMouse = vetorMouse - vetorNave
-    angulo = -vtNaveMouse.angle_to(pygame.math.Vector2(0,0)) #?
+    angulo = -vtNaveMouse.angle_to(pygame.math.Vector2(0, 0)) #??
     correcaoAngulo = -90
     angulo = angulo - correcaoAngulo
     naveRot = pygame.transform.rotate(nave, -angulo)
     naveRecRot = naveRot.get_rect(center=naveRec.center)
+    sombraRetNaveRot = naveRecRot
+    centerRectNave = naveRec.center
+
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
-            print(f"X: {naveRecRot.midtop[0]} \nY: {naveRecRot.midtop[1]}")
-            vetorAceleracao = vetorMouse - vetorNave
+            vetorAceleracao = vetorMouse - pygame.math.Vector2(centerRectNave)
             vetorNormalizado = vetorAceleracao.normalize()
             #offset = pygame.math.Vector2(naveRecRot.width / 2, 0).rotate(-vetorNormalizado.as_polar()[1])
-            laser = Laser(vetorNave, vetorNormalizado, angulo)
+            laser = Laser(pygame.math.Vector2(centerRectNave), vetorNormalizado, angulo)
             laser_list.append(laser)
         if event.type == pygame.MOUSEBUTTONUP:
             pass
@@ -118,10 +135,7 @@ while(loop):
 
     navex = naveRec.x
     navey = naveRec.y
-    #tela.blit(texto,bgR1)
     display_score(tela=tela, font=font)
-    #laserRec.y -= velocidadeDisparo
-    #tela.blit(lasersurf,laserRec)
 
     #Nao permite que a nave saia da tela // calibrar
     if naveRec.y <= 0:
@@ -133,23 +147,32 @@ while(loop):
     if naveRec.x >= largura:
         naveRec.x = 0
 
-    surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
-    pygame.draw.circle(surfaceEscudo, (200, 200, 200, 100), (100, 100), 50)
-    tela.blit(surfaceEscudo, (navex -80 , navey - 80))
+    tela.blit(surfaceEscudo, (navex - 70, navey - 70))
+
     #pygame.display.flip()
     #pygame.time.Clock().tick(60)
 
-    for laserRec in laser_list:
-        laserRot = pygame.transform.rotate(lasersurf,-laserRec.getAngulo())
-        tela.blit(laserRot,laserRec.getVetLaser() )
+    for laser in laser_list:
+        laserRot = pygame.transform.rotate(lasersurf, -laser.getAngulo())
+        tela.blit(laserRot,laser.getVetLaser() )
         #print(f"Lista: {laser_list}")
-    tela.blit(naveRot, naveRecRot)
-
     update_laser(laser_list)
 
-    #start = int(round(time.time() * 1000))
-    #end = int(round(time.time()*1000))    Pega o "ping" entre as cenas
-    #print(f'{end-start} ms')
+    tela.blit(naveRot, (naveRecRot.x + 10, naveRecRot.y + 10))
 
+    #Hitbox nave
+    rectHBn = pygame.Rect(naveRec.x + 10, naveRec.y + 10, scaleNave[0], scaleNave[1])
+    #pygame.draw.rect(tela, (200,200,200), rectHBn)
+
+
+    #Hitbox Meteoro
+    rectHBm = pygame.Rect(posMx, posMy, larguraM, alturaM)
+    #pygame.draw.rect(tela, (200,200,200), rectHBm)
+    if not rectHBm.colliderect(rectHBn):
+        tela.blit(meteoro,(posMx,posMy))
+
+    # start = int(round(time.time() * 1000))
+    # end = int(round(time.time()*1000))    Pega o "ping" entre as cenas
+    # print(f'{end-start} ms')
     pygame.display.update()
 pygame.quit()
