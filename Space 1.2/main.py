@@ -1,9 +1,9 @@
 import pygame
 import sys,os,time
 from pygame.locals import *
-from Classes import Laser
+from Classes import Laser, Meteoro
 pygame.init()
-#Teste
+
 #Funcoes
 #Deleta o tiro
 def update_laser(laser_list):
@@ -19,6 +19,9 @@ def display_score(tela, font):
     texto = font.render(score_text, True, (255,255,255))
     recText = texto.get_rect(midleft=(30,15))
     tela.blit(texto, recText)
+
+def spawnMeteoro():
+    tela.fill((255,255,255))
 
 #Tela
 pygame.display.set_caption('Space Shooter')
@@ -56,7 +59,9 @@ nave = pygame.transform.scale(nave, scaleNave)
 
 #Disparo da nave
 lasersurf = pygame.image.load(os.path.join("assets", "img", "laser.png")).convert_alpha()
-lasersurf = pygame.transform.scale(lasersurf, (20, 20))
+wLaser = 20
+hLaser = 20
+lasersurf = pygame.transform.scale(lasersurf, (wLaser, hLaser))
 laser_list = []
 
 #Meteoro
@@ -68,6 +73,10 @@ meteoro_list = []
 posMx = 200
 posMy = 200
 meteoroB = True
+
+#timerSpawnMeteoro
+spawnMeteoro = pygame.USEREVENT + 1
+pygame.time.set_timer(spawnMeteoro,5000)
 
 #Escudo
 surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
@@ -124,6 +133,8 @@ while(loop):
                 mov_cima = False
             if event.key == pygame.K_s:
                 mov_baixo = False
+        if event.type == spawnMeteoro:
+            pass
     if mov_esquerda:
         naveRec.x -= velocidade
     if mov_direita:
@@ -153,8 +164,14 @@ while(loop):
     #pygame.time.Clock().tick(60)
 
     for laser in laser_list:
+        rectTiroAtual = pygame.Rect(laser.getVetLaser().x,laser.getVetLaser().y,wLaser,hLaser)
         laserRot = pygame.transform.rotate(lasersurf, -laser.getAngulo())
+        #rectTiroAtual = pygame.transform.rotate(rectTiroAtual, -laser.getAngulo())
+        pygame.draw.rect(tela,(255,0,0),rectTiroAtual)
         tela.blit(laserRot,laser.getVetLaser() )
+        if rectTiroAtual.colliderect(rectHBm):
+            meteoroB = False
+            laser_list.remove(laser)
         #print(f"Lista: {laser_list}")
     update_laser(laser_list)
 
@@ -167,12 +184,13 @@ while(loop):
 
     #Hitbox Meteoro
     rectHBm = pygame.Rect(posMx, posMy, larguraM, alturaM)
-    #pygame.draw.rect(tela, (200,200,200), rectHBm)
-    if not rectHBm.colliderect(rectHBn):
+    pygame.draw.rect(tela, (200,200,200), rectHBm)
+    if meteoroB:
         tela.blit(meteoro,(posMx,posMy))
 
     # start = int(round(time.time() * 1000))
     # end = int(round(time.time()*1000))    Pega o "ping" entre as cenas
     # print(f'{end-start} ms')
     pygame.display.update()
+
 pygame.quit()
