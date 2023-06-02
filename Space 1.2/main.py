@@ -3,7 +3,7 @@ import sys,os,time
 from pygame.locals import *
 from Classes import Laser
 pygame.init()
-
+#Teste
 #Funcoes
 #Deleta o tiro
 def update_laser(laser_list):
