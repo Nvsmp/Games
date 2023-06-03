@@ -23,18 +23,17 @@ def limpaCometas(meteoro_list, laser_list):
                 meteoro_list.remove(m)
                 laser_list.remove(l)
                 return 0
-Rect
+        if m.getVet().x > largura + larguraM or m.getVet().x < 0 - larguraM or m.getVet().y > altura + alturaM or m.getVet().y < 0 - alturaM:
+            meteoro_list.remove(m)
+            return 0
 def update_M(meteoro_list):
     for meteoros in meteoro_list:
         aM = meteoros.getAceleracao() * meteoros.getSpeed()
         vetM = meteoros.getVet() + aM
         meteoros.setVet(vetM)
-        
-
-
 #Pontuacao
 def display_score(tela, font):
-    score_text = str(f'S T A R - G A M E {pygame.time.get_ticks()//1000}')
+    score_text = str(f'TEMPO: {pygame.time.get_ticks()//1000} | TEMPO DE ATUALIZACAO : {tempoA}')
     texto = font.render(score_text, True, (255,255,255))
     recText = texto.get_rect(midleft=(30,15))
     tela.blit(texto, recText)
@@ -50,6 +49,7 @@ relogio = pygame.time.Clock()
 velocidade = 5
 speed = 300 #velocidade tiro
 pos_y,pos_x  = altura / 2, largura /2
+tempoA = 0
 
 #MOVIMENTACAO WASD
 mov_esquerda = False
@@ -83,8 +83,8 @@ laser_list = []
 
 #Meteoro
 meteoro = pygame.image.load(os.path.join("assets", "img", "meteor.png")).convert_alpha()
-larguraM = 70
-alturaM = 70
+larguraM = 100
+alturaM = 100
 meteoro = pygame.transform.scale(meteoro, (larguraM, alturaM))
 meteoro_list = []
 posMx = 200
@@ -92,7 +92,15 @@ posMy = 200
 
 #timerSpawnMeteoro
 spawnMeteoro = pygame.USEREVENT + 1
-pygame.time.set_timer(spawnMeteoro,2500)
+print(f"USER EVENT 1 : {spawnMeteoro}")
+tempoSpawn = 1000
+pygame.time.set_timer(spawnMeteoro,tempoSpawn)
+
+#timerDificuldade
+subirDificuldade = pygame.USEREVENT + 2
+print(f"USER EVENT 2 : {subirDificuldade}")
+tempoSubirD = 5000
+pygame.time.set_timer(subirDificuldade, tempoSubirD)
 
 #Escudo
 surfaceEscudo = pygame.Surface((200, 200), pygame.SRCALPHA)
@@ -102,6 +110,7 @@ pygame.draw.circle(surfaceEscudo, (200, 200, 200, 50), (100, 100), 40)
 naveRec = nave.get_rect(center=(largura / 2, altura / 2)) #Define o rect padrao no meio da tela
 #meteoroRec = meteoro.get_rect(topleft=(200,200))
 while(loop):
+    start = int(round(time.time() * 1000)) #START PARA PEGAR O DELAY
     tela.blit(fundo, (0, 0))
     dt = relogio.tick(120)/1000
     mousex, mousey = pygame.mouse.get_pos()
@@ -116,21 +125,21 @@ while(loop):
     sombraRetNaveRot = naveRecRot
     centerRectNave = naveRec.center
 
+    #EVENTOS
     for event in pygame.event.get():
+        #TIRO
         if event.type == pygame.MOUSEBUTTONDOWN:
             vetorAceleracao = vetorMouse - pygame.math.Vector2(centerRectNave)
             vetorNormalizado = vetorAceleracao.normalize()
-            #offset = pygame.math.Vector2(naveRecRot.width / 2, 0).rotate(-vetorNormalizado.as_polar()[1])
             laser = Laser(pygame.math.Vector2(centerRectNave), vetorNormalizado, angulo)
             laser_list.append(laser)
         if event.type == pygame.MOUSEBUTTONUP:
             pass
-            #print(f'Tiro em {event.pos}')
-
+        #QUITAR
         if event.type == pygame.QUIT:
             loop = False
             sys.exit()
-        #EVENTO MOVIMENTO (KEYDOWN e KEYUP)
+        #MOVIMENTO NAVE(KEYDOWN e KEYUP)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
                 mov_esquerda = True
@@ -149,15 +158,22 @@ while(loop):
                 mov_cima = False
             if event.key == pygame.K_s:
                 mov_baixo = False
+        #SPAWN METEORO
         if event.type == spawnMeteoro:
-            randX = random.randrange(0,largura)
-            randY = random.randrange(0,altura)
+            randX = random.randrange(0 - larguraM ,largura + larguraM )
+            randY = random.randrange(0 - alturaM ,altura + alturaM )
+            while( randX > 0 and randX < largura):
+                randX = random.randrange(0 - larguraM * 2, largura + larguraM * 2)
+            while(randY > 0 and randY < altura):
+                randY = random.randrange(0 - alturaM * 2, altura + alturaM * 2)
             vetorMeteoroA = pygame.math.Vector2(centerRectNave) - pygame.math.Vector2(randX,randY)
             vetorMeteoroA = vetorMeteoroA.normalize()
             vetorMeteoro = pygame.math.Vector2(randX,randY)
-            print(f"EVENTO randX: {randX}  randY: {randY}  vetorMeteoroA: {vetorMeteoroA}  vetorMeteoro: {vetorMeteoro}")
+            #print(f"EVENTO randX: {randX}  randY: {randY}  vetorMeteoroA: {vetorMeteoroA}  vetorMeteoro: {vetorMeteoro}")
             meteoroT = Meteoro(vetorMeteoro,vetorMeteoroA)
             meteoro_list.append(meteoroT)
+            #FIM DOS EVENTOS
+    #ATUALIZA POSICAO NAVE
     if mov_esquerda:
         naveRec.x -= velocidade
     if mov_direita:
@@ -166,9 +182,9 @@ while(loop):
         naveRec.y -= velocidade
     if mov_baixo:
         naveRec.y += velocidade
-
     navex = naveRec.x
     navey = naveRec.y
+    #PONTUACAO
     display_score(tela=tela, font=font)
 
     #Nao permite que a nave saia da tela // calibrar
@@ -181,31 +197,27 @@ while(loop):
     if naveRec.x >= largura:
         naveRec.x = 0
 
-    tela.blit(surfaceEscudo, (navex - 70, navey - 70))
-
-    #pygame.display.flip()
-    #pygame.time.Clock().tick(60)
-
+    tela.blit(surfaceEscudo, (navex - 70, navey - 70))   #BLITA ESCUDO
+    #BLITA LASER
     for laser in laser_list:
         laserRot = pygame.transform.rotate(lasersurf, -laser.getAngulo())
         tela.blit(laserRot,laser.getVetLaser() )
         #print(f"Lista: {laser_list}")
 
-    for meteoros in meteoro_list:
+    for meteoros in meteoro_list: #BLITA METEORO
         tela.blit(meteoro, meteoros.getVet())
 
-    update_L(laser_list)
-    update_M(meteoro_list)
+    tela.blit(naveRot, (naveRecRot.x + 10, naveRecRot.y + 10)) #BLITA NAVE - TEM QUE SER DEPOIS DO LASER
 
-    tela.blit(naveRot, (naveRecRot.x + 10, naveRecRot.y + 10))
+    update_L(laser_list) #ATUALIZA LASER
+    update_M(meteoro_list) #ATUALIZA METEORO
 
     #Hitbox nave
     rectHBn = pygame.Rect(naveRec.x + 10, naveRec.y + 10, scaleNave[0], scaleNave[1])
     #pygame.draw.rect(tela, (200,200,200), rectHBn)
 
-    # start = int(round(time.time() * 1000))
-    # end = int(round(time.time()*1000))    Pega o "ping" entre as cenas
-    # print(f'{end-start} ms')
+    end = int(round(time.time()*1000))
+    tempoA = end-start         #Pega o "ping" entre as cenas
     pygame.display.update()
     limpaCometas(meteoro_list, laser_list)
 pygame.quit()
