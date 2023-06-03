@@ -26,10 +26,11 @@ def limpaCometas(meteoro_list, laser_list):
 Rect
 def update_M(meteoro_list):
     for meteoros in meteoro_list:
-        velocidadeM = meteoros.getAceleracao() * meteoros.getSpeed()
-        posNM = meteoros.getVet() + velocidadeM
-        meteoros.setVet(posNM)
-        meteoro_list.append(meteoros)
+        aM = meteoros.getAceleracao() * meteoros.getSpeed()
+        vetM = meteoros.getVet() + aM
+        meteoros.setVet(vetM)
+        
+
 
 #Pontuacao
 def display_score(tela, font):
@@ -194,7 +195,7 @@ while(loop):
         tela.blit(meteoro, meteoros.getVet())
 
     update_L(laser_list)
-    #update_M(meteoro_list)
+    update_M(meteoro_list)
 
     tela.blit(naveRot, (naveRecRot.x + 10, naveRecRot.y + 10))
 

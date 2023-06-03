@@ -1,3 +1,5 @@
+import pygame
+from pygame.locals import *
 class Meteoro:
     def __init__(self,vetMeteoro,vetAceleraçao) -> None:
         self.__vetMeteoro = vetMeteoro
