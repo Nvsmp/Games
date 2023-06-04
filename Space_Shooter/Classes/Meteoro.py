@@ -5,6 +5,8 @@ class Meteoro:
         self.__vetMeteoro = vetMeteoro
         self.__vetAceleracao = vetAceleraçao
         self.__speed = 2
+        self.__vida = 1
+        self.__dano = 1
 
     def getVet(self):
         return self.__vetMeteoro
@@ -17,3 +19,15 @@ class Meteoro:
 
     def setVet(self, vetorNovo):
         self.__vetMeteoro = vetorNovo
+
+    def getVida(self):
+        return self.__vida
+
+    def upVida(self):
+        self.__vida += 1
+
+    def getDano(self):
+        return self.__dano
+
+    def upDano(self):
+        self.__dano += 1

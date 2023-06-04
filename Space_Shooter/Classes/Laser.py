@@ -6,6 +6,7 @@ class Laser:
         self.__vetAceleracao = vetAceleracao
         self.__angulo = angulo
         self.__speed = 10
+        self.__dano = 1
 
     def getAngulo(self):
         return self.__angulo
@@ -24,3 +25,9 @@ class Laser:
 
     def setVetAceleracao(self,vetA):
         self.__vetAceleracao = vetA
+
+    def getDano(self):
+        return self.__dano
+
+    def upDano(self):
+        self.__dano += 1
