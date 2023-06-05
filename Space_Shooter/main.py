@@ -13,21 +13,25 @@ def update_L(laser_list):
         lasers.setVetPos(pos)
         if lasers.getVetLaser().x < 0 or lasers.getVetLaser().x > largura or lasers.getVetLaser().y < 0 or lasers.getVetLaser().y > altura:
             laser_list.remove(lasers)
+            continue
 
 def limpaCometas(meteoro_list, laser_list):
-    for m in meteoro_list:
-        rectM = pygame.Rect(m.getVet().x + 40, m.getVet().y + 30, larguraM - 50, alturaM - 40)
-        for l in laser_list:
-            rectL = pygame.Rect(l.getVetLaser().x, l.getVetLaser().y, larguraN, alturaN)
+    for l in laser_list:
+        killLaser = False
+        rectL = pygame.Rect(l.getVetLaser().x, l.getVetLaser().y, larguraN, alturaN)
+        for m in meteoro_list:
+            rectM = pygame.Rect(m.getVet().x + 40, m.getVet().y + 30, larguraM - 50, alturaM - 40)
             if rectL.colliderect(rectM):
                 m.getHited(l.getDano())
                 if m.getVida() <= 0:
                     meteoro_list.remove(m)
-                laser_list.remove(l)
+                killLaser = True
                 continue
-        if m.getVet().x > largura + larguraM or m.getVet().x < 0 - larguraM or m.getVet().y > altura + alturaM or m.getVet().y < 0 - alturaM:
-            meteoro_list.remove(m)
-            continue
+            if m.getVet().x > largura + larguraM or m.getVet().x < 0 - larguraM or m.getVet().y > altura + alturaM or m.getVet().y < 0 - alturaM:
+                meteoro_list.remove(m)
+                continue
+        if killLaser:
+            laser_list.remove(l)
 def update_M(meteoro_list):
     for meteoros in meteoro_list:
         aM = meteoros.getAceleracao() * meteoros.getSpeed()
