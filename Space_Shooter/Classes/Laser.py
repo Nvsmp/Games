@@ -26,7 +26,7 @@ class Laser:
     def setVetAceleracao(self,vetA):
         self.__vetAceleracao = vetA
 
-    def getDano(self):
+    def getDano(self)-> int:
         return self.__dano
 
     def upDano(self):

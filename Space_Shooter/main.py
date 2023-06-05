@@ -20,30 +20,35 @@ def limpaCometas(meteoro_list, laser_list):
         for l in laser_list:
             rectL = pygame.Rect(l.getVetLaser().x, l.getVetLaser().y, larguraN, alturaN)
             if rectL.colliderect(rectM):
-                meteoro_list.remove(m)
+                m.getHited(l.getDano())
+                if m.getVida() <= 0:
+                    meteoro_list.remove(m)
                 laser_list.remove(l)
-                return 0
+                continue
         if m.getVet().x > largura + larguraM or m.getVet().x < 0 - larguraM or m.getVet().y > altura + alturaM or m.getVet().y < 0 - alturaM:
             meteoro_list.remove(m)
-            return 0
+            continue
 def update_M(meteoro_list):
     for meteoros in meteoro_list:
         aM = meteoros.getAceleracao() * meteoros.getSpeed()
         vetM = meteoros.getVet() + aM
         meteoros.setVet(vetM)
 #Pontuacao
-def display_score(tela, font):
-    score_text = str(f'TEMPO: {pygame.time.get_ticks()//1000} | TEMPO DE ATUALIZACAO : {tempoA}')
-    texto = font.render(score_text, True, (255,255,255))
-    recText = texto.get_rect(midleft=(30,15))
-    tela.blit(texto, recText)
+def display_score(tela, font, vidaNave, tvn):
+    textoTempo = str(f'TEMPO: {pygame.time.get_ticks()//1000} | TEMPO DE ATUALIZACAO : {tempoA}')
+    textoTempo = font.render(textoTempo, True, (255,255,255))
+    recTextTempo = textoTempo.get_rect(midleft=(30, 15))
+    textVida = str(f"VIDA NAVE : {vidaNave}/{tvn}")
+    textVida = font.render(textVida, True, (255,255,255))
+    rectTextoVida = textVida.get_rect(midleft=(30,35))
+    tela.blit(textoTempo, recTextTempo)
+    tela.blit(textVida,rectTextoVida)
 #Tela
 pygame.display.set_caption('Space Shooter')
 largura, altura = 1280,720 #FULL HD
 tela = pygame.display.set_mode((largura, altura))
 
 #VARS
-loop = True
 r,g,b = 0,0,0
 relogio = pygame.time.Clock()
 velocidade = 5
@@ -73,7 +78,8 @@ larguraN = 40
 alturaN = 40
 scaleNave = (larguraN, alturaN)
 nave = pygame.transform.scale(nave, scaleNave)
-vidaN = 3
+vidaN = 15
+totalVidaN = vidaN
 
 #Disparo da nave
 lasersurf = pygame.image.load(os.path.join("assets", "img", "laser.png")).convert_alpha()
@@ -90,6 +96,7 @@ meteoro = pygame.transform.scale(meteoro, (larguraM, alturaM))
 meteoro_list = []
 posMx = 200
 posMy = 200
+vidaM = 1
 
 #timerSpawnMeteoro
 spawnMeteoro = pygame.USEREVENT + 1
@@ -100,7 +107,7 @@ pygame.time.set_timer(spawnMeteoro,tempoSpawn)
 #timerDificuldade
 subirDificuldade = pygame.USEREVENT + 2
 print(f"USER EVENT 2 : {subirDificuldade}")
-tempoSubirD = 5000
+tempoSubirD = 30000
 pygame.time.set_timer(subirDificuldade, tempoSubirD)
 
 #Escudo
@@ -110,7 +117,7 @@ pygame.draw.circle(surfaceEscudo, (200, 200, 200, 50), (100, 100), 40)
 #?
 naveRec = nave.get_rect(center=(largura / 2, altura / 2)) #Define o rect padrao no meio da tela
 #meteoroRec = meteoro.get_rect(topleft=(200,200))
-while(vidaN > 0):
+while vidaN > 0:
     start = int(round(time.time() * 1000)) #START PARA PEGAR O DELAY
     tela.blit(fundo, (0, 0))
     dt = relogio.tick(120)/1000
@@ -171,8 +178,10 @@ while(vidaN > 0):
             vetorMeteoroA = vetorMeteoroA.normalize()
             vetorMeteoro = pygame.math.Vector2(randX,randY)
             #print(f"EVENTO randX: {randX}  randY: {randY}  vetorMeteoroA: {vetorMeteoroA}  vetorMeteoro: {vetorMeteoro}")
-            meteoroT = Meteoro(vetorMeteoro,vetorMeteoroA)
+            meteoroT = Meteoro(vetorMeteoro,vetorMeteoroA,vidaM)
             meteoro_list.append(meteoroT)
+        if event.type == subirDificuldade:
+            vidaM += 1
             #FIM DOS EVENTOS
     #ATUALIZA POSICAO NAVE
     if mov_esquerda:
@@ -186,7 +195,7 @@ while(vidaN > 0):
     navex = naveRec.x
     navey = naveRec.y
     #PONTUACAO
-    display_score(tela=tela, font=font)
+    display_score(tela=tela, font=font, vidaNave=vidaN, tvn=totalVidaN)
 
     #Nao permite que a nave saia da tela // calibrar
     if naveRec.y <= 0:
@@ -211,19 +220,26 @@ while(vidaN > 0):
         tela.blit(meteoro, meteoros.getVet())
         rectHBn = pygame.Rect(naveRec.x + 13, naveRec.y + 13, scaleNave[0] - 5, scaleNave[1] - 5)  #Hitbox nave
         rectHBm = pygame.Rect(meteoros.getVet().x + 6,meteoros.getVet().y + 6,larguraM - 12,alturaM - 12)
+
+
+        textVidaM = str(f'{str(meteoros.getVida())}')
+        textoVidaM = font.render(textVidaM, True, (255, 100, 100))
+        rectTextoVidaM = textoVidaM.get_rect(midleft=(meteoros.getVet().x + (larguraM/2) , meteoros.getVet().y + alturaM))
+        tela.blit(textoVidaM,rectTextoVidaM)
+
         if rectHBm.colliderect(rectHBn):
             vidaN -= meteoros.getDano()
             meteoro_list.remove(meteoros)
+            continue
         #pygame.draw.rect(tela, (200,200,200), rectHBm)
         #pygame.draw.rect(tela, (200, 200, 200), rectHBn)
-
 
     update_L(laser_list) #ATUALIZA LASER
     update_M(meteoro_list) #ATUALIZA METEORO
     limpaCometas(meteoro_list, laser_list)
-
+    # Pega o "ping" entre as cenas
     end = int(round(time.time()*1000))
-    tempoA = end-start         #Pega o "ping" entre as cenas
+    tempoA = end-start
     pygame.display.update()
 
 pygame.quit()
