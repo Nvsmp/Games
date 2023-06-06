@@ -15,7 +15,7 @@ def update_L(laser_list):
             laser_list.remove(lasers)
             continue
 
-def limpaCometas(meteoro_list, laser_list):
+def limpaCometas(meteoro_list, laser_list, xpN):
     for l in laser_list:
         killLaser = False
         rectL = pygame.Rect(l.getVetLaser().x, l.getVetLaser().y, larguraN, alturaN)
@@ -25,6 +25,7 @@ def limpaCometas(meteoro_list, laser_list):
                 m.getHited(l.getDano())
                 if m.getVida() <= 0:
                     meteoro_list.remove(m)
+                    xpN[0] += 1
                 killLaser = True
                 continue
             if m.getVet().x > largura + larguraM or m.getVet().x < 0 - larguraM or m.getVet().y > altura + alturaM or m.getVet().y < 0 - alturaM:
@@ -38,7 +39,7 @@ def update_M(meteoro_list):
         vetM = meteoros.getVet() + aM
         meteoros.setVet(vetM)
 #Pontuacao
-def display_score(tela, font, vidaNave, tvn):
+def display_score(tela, font, vidaNave, tvn, n, xp):
     textoTempo = str(f'TEMPO: {pygame.time.get_ticks()//1000} | TEMPO DE ATUALIZACAO : {tempoA}')
     textoTempo = font.render(textoTempo, True, (255,255,255))
     recTextTempo = textoTempo.get_rect(midleft=(30, 15))
@@ -47,6 +48,13 @@ def display_score(tela, font, vidaNave, tvn):
     rectTextoVida = textVida.get_rect(midleft=(30,35))
     tela.blit(textoTempo, recTextTempo)
     tela.blit(textVida,rectTextoVida)
+    textNivel = str(f"NIVEL : {n}")
+    textNivel = font.render(textNivel, True, (100, 255, 100) )
+    rectTextNivel = textNivel.get_rect(midleft=(30, 75))
+    tela.blit(textNivel, rectTextNivel)
+    textXP = font.render('XP ' + str(xp), True, (100, 100, 255))
+    rectTextXP = textXP.get_rect(midleft=(30,55))
+    tela.blit(textXP,rectTextXP)
 #Tela
 pygame.display.set_caption('Space Shooter')
 largura, altura = 1280,720 #FULL HD
@@ -84,6 +92,8 @@ scaleNave = (larguraN, alturaN)
 nave = pygame.transform.scale(nave, scaleNave)
 vidaN = 15
 totalVidaN = vidaN
+xp = [0,10]
+nivel = 1
 
 #Disparo da nave
 lasersurf = pygame.image.load(os.path.join("assets", "img", "laser.png")).convert_alpha()
@@ -136,6 +146,12 @@ while vidaN > 0:
     naveRecRot = naveRot.get_rect(center=naveRec.center)
     sombraRetNaveRot = naveRecRot
     centerRectNave = naveRec.centerx + 8,naveRec.centery + 7
+
+    if xp[0] >= xp[1]:
+        nivel += 1
+        resto = xp[0] - xp[1]
+        xp[0] = 0 + resto
+        xp[1] = xp[1] * 2
 
     #EVENTOS
     for event in pygame.event.get():
@@ -199,7 +215,7 @@ while vidaN > 0:
     navex = naveRec.x
     navey = naveRec.y
     #PONTUACAO
-    display_score(tela=tela, font=font, vidaNave=vidaN, tvn=totalVidaN)
+    display_score(tela=tela, font=font, vidaNave=vidaN, tvn=totalVidaN, n=nivel,xp=xp)
 
     #Nao permite que a nave saia da tela // calibrar
     if naveRec.y <= 0:
@@ -232,7 +248,7 @@ while vidaN > 0:
         tela.blit(textoVidaM,rectTextoVidaM)
 
         if rectHBm.colliderect(rectHBn):
-            vidaN -= meteoros.getDano()
+            vidaN -= meteoros.getVida()
             meteoro_list.remove(meteoros)
             continue
         #pygame.draw.rect(tela, (200,200,200), rectHBm)
@@ -240,7 +256,7 @@ while vidaN > 0:
 
     update_L(laser_list) #ATUALIZA LASER
     update_M(meteoro_list) #ATUALIZA METEORO
-    limpaCometas(meteoro_list, laser_list)
+    limpaCometas(meteoro_list, laser_list,xp)
     # Pega o "ping" entre as cenas
     end = int(round(time.time()*1000))
     tempoA = end-start

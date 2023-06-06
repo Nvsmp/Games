@@ -6,7 +6,6 @@ class Meteoro:
         self.__vetAceleracao = vetAceleraçao
         self.__speed = 2
         self.__vida = vida
-        self.__dano = 1
         self.__vidaTotal = vida
 
     def getVet(self):
