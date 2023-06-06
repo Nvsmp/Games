@@ -1,12 +1,12 @@
 import pygame
 from pygame.locals import *
 class Laser:
-    def __init__(self, vetLaser,vetAceleracao, angulo):
+    def __init__(self, vetLaser,vetAceleracao, angulo,dano):
         self.__vetLaser = vetLaser
         self.__vetAceleracao = vetAceleracao
         self.__angulo = angulo
         self.__speed = 10
-        self.__dano = 1
+        self.__dano = dano
 
     def getAngulo(self):
         return self.__angulo
