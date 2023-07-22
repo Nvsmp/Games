@@ -35,16 +35,15 @@ func _process(delta):
 	position.x = clamp(position.x, 0, screen_size.x)
 	position.y = clamp(position.y, 0, screen_size.y)
 	
-	printt("delta: ", delta, "velocidade: ", velocidade, "position: ",position)	
+	#printt("delta: ", delta, "velocidade: ", velocidade, "position: ",position)	
 	
 	if velocidade.x != 0:
 		$AnimatedSprite2D.animation = "walk"
 		$AnimatedSprite2D.flip_h = velocidade.x < 0
 	elif velocidade.y != 0:
 		$AnimatedSprite2D.animation = "up"
-		$AnimatedSprite2D. flip_v = velocidade.y > 0
+		$AnimatedSprite2D.flip_v = velocidade.y > 0
 	else:
-		
 		$AnimatedSprite2D.flip_v = false
 
 
