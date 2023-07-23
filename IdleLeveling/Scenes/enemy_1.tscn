@@ -58,15 +58,18 @@ size = Vector2(38, 50)
 
 [node name="Enemy1" type="Area2D"]
 scale = Vector2(0.5, 0.5)
+collision_layer = 3
+collision_mask = 2
 script = ExtResource("1_hij64")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2DEnemy" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_65dgk")
 animation = &"walking"
 frame_progress = 0.0980411
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["inimigo"]]
 position = Vector2(1, 5)
 shape = SubResource("RectangleShape2D_y2ulo")
 

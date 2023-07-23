@@ -12,7 +12,3 @@ func _ready():
 func _process(delta):
 	position.x -= 1
 	
-
-
-func _on_area_entered(area):
-	queue_free()

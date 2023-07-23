@@ -21,7 +21,7 @@ var xp_torre:int = 0
 var regen_vida_torre:int = 0
 var preco_up_regen_vida:int = 5
 var preco_up_life_torre_max:int = 10
-var dicionario_pos_spawn = {1:Vector2(400,360)}
+var dicionario_pos_spawn = {1:Vector2(500,360)}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
