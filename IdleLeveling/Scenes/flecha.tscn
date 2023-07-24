@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://b3d7kdrjw0d8j"]
+
+[ext_resource type="Script" path="res://Scripts/flecha.gd" id="1_dashm"]
+[ext_resource type="Texture2D" uid="uid://bpwwvumm2t7ou" path="res://Assets/torre/3 Units/Arrow/22.png" id="2_vt5q3"]
+[ext_resource type="Texture2D" uid="uid://svdcxx3vhqkh" path="res://Assets/torre/3 Units/Arrow/13.png" id="3_opyim"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_x74yx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_vt5q3")
+}],
+"loop": true,
+"name": &"0",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_opyim")
+}],
+"loop": true,
+"name": &"1",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0nbsu"]
+size = Vector2(14, 4)
+
+[node name="Area2D" type="Area2D"]
+collision_layer = 4
+collision_mask = 4
+script = ExtResource("1_dashm")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_x74yx")
+animation = &"1"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_0nbsu")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://dbh4a7sy4xak0"]
 
 [ext_resource type="Texture2D" uid="uid://mwpgwf45vwx2" path="res://Assets/kenney_abstract-platformer/Tilesheet/tilesheet_complete.png" id="1_662og"]
-[ext_resource type="PackedScene" uid="uid://yi2kd3qiselm" path="res://torre.tscn" id="1_lu74o"]
+[ext_resource type="PackedScene" uid="uid://yi2kd3qiselm" path="res://Scenes/torre.tscn" id="1_lu74o"]
 [ext_resource type="PackedScene" uid="uid://bv8wewhqmpy2j" path="res://Scenes/enemy_1.tscn" id="1_q6yif"]
 [ext_resource type="Texture2D" uid="uid://bcuumxc4orxgu" path="res://Assets/ground/grass.png" id="2_cy2ua"]
 [ext_resource type="Texture2D" uid="uid://dy1tka0w7htgu" path="res://Assets/ground/bush_01.png" id="3_yr57u"]
