@@ -8,7 +8,6 @@ var dano:int = 1
 func _ready():
 	pass
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	position += direcao * speed * delta
@@ -18,9 +17,7 @@ func set_dir(dir,pos_torre):
 	direcao = dir - pos_torre
 	direcao = direcao.normalized()
 
-
-
 func _on_area_entered(area):
-	print("hit")
+	#print("hit")
 	area.vida -= dano
 	queue_free()

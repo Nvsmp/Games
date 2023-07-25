@@ -21,7 +21,9 @@ var xp_torre:int = 0
 var regen_vida_torre:int = 0
 var preco_up_regen_vida:int = 5
 var preco_up_life_torre_max:int = 10
-var dicionario_pos_spawn = {1:Vector2(500,360)}
+var position_torre:Vector2 = Vector2(240,360)
+var dicionario_pos_spawn = {1:Vector2(-20,360),2:Vector2(500,360)}
+var num:int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -36,7 +38,6 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#print(screen_size)
-	
 	$LabelGold.set(\"text\", \"Gold : \"+str(gold))
 	$LabelLife.set(\"text\", \"Torre : \"+str($Torre.vida_torre)+\" | \"+ str($Torre.vida_torre_max))
 	$LabelXP.set(\"text\", \"XP : \"+str($Torre.xp))
@@ -46,6 +47,7 @@ func _process(delta):
 	$ButtonUpRegenVida.set(\"text\",\"REGEN VIDA (\"+str( $Torre.regen_vida)+\")\\n\"+str($Torre.preco_up_regen_vida)+\" GOLD (+1)\")
 	$ButtonUpTorre.set(\"text\", \"VIDA MAX TORRE (\"+str($Torre.vida_torre_max)+\")\\n\"+str($Torre.preco_up_vida_max)+\" GOLD (+5)\")
 	#print(dicionario_pos_spawn[1])
+	#print_debug(\"POS TORRE: \"+ str($Torre.position) )
 	
 func _on_timer_gold_passivo_timeout():
 	gold += gold_passivo
@@ -60,15 +62,17 @@ func _on_button_up_regen_vida_pressed():
 		$Torre.regen_vida += 1
 		gold -= $Torre.preco_up_regen_vida
 
-
 func _on_timer_spawn_mob_timeout():
+	num = randi_range(1,2)
 	var mob = mob_scene.instantiate()
-	mob.position = dicionario_pos_spawn[1]
+	mob.position = dicionario_pos_spawn[num]
+	mob.set_dir($Torre.position)
 	#print(mob.get_child(0).get_property_list())
-	mob.get_child(0).set(\"flip_h\", true)
+	if mob.position.x > 240:
+		mob.get_child(0).set(\"flip_h\", true)
 	mob.dano = 2
 	add_child(mob)
-
+	print_debug(\"Mob Spawnou\")
 
 func _on_button_up_gold_passivo_pressed():
 	gold_passivo += 1
@@ -3672,7 +3676,6 @@ text = "GOLD PASSIVO (0)
 10 GOLD (+1)"
 
 [node name="TimerSpawnMob" type="Timer" parent="."]
-wait_time = 2.0
 autostart = true
 
 [connection signal="pressed" from="ButtonUpTorre" to="." method="_on_button_up_torre_pressed"]

@@ -10,12 +10,12 @@ extends Area2D
 var atacando:bool = false
 var array_inimigos:Array = []
 @export var tiro_em_cd:bool = false
+var last_enemy_pos: Vector2
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 	$AnimatedSprite2D.play("1")
 	$AnimatedSprite2D/Arqueiro.play("idle")
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -25,46 +25,37 @@ func _process(delta):
 		$AnimatedSprite2D/Arqueiro.play("idle")
 	#printt("Array de inimigos: "+ str(array_inimigos))
 	if !array_inimigos.is_empty():
-		atacando = true
 		if str(array_inimigos[0]) == "<Freed Object>":
 			array_inimigos.remove_at(0)
+	
+	if !array_inimigos.is_empty():
+		atacando = true
+		last_enemy_pos = array_inimigos[0].position
 		if !tiro_em_cd:
-			#print("tiro")
 			var flecha = flecha_scene.instantiate()
 			flecha.position = Vector2.ZERO
-			flecha.set_dir(array_inimigos[0].position, position)
+			flecha.set_dir(last_enemy_pos, position)
 			add_child(flecha)
 			tiro_em_cd = true
 			$TimerCD.start()
-			
-			
 	else:
 		atacando = false
-
 	
 func uparVida()->void:
 	vida_torre_max += 5
-
-
+	
 func _on_timer_regen_vida_timeout():
 	vida_torre += regen_vida
 	if vida_torre > vida_torre_max:
 		vida_torre = vida_torre_max
 
-
 func _on_range_area_entered(area):
-	print("Inimigo entrou no range da torre")
+	#print("Inimigo entrou no range da torre")
 	array_inimigos.append(area)
-	
-
 
 func _on_area_2d_hitbox_area_entered(area):
 	area.queue_free()
 	vida_torre -= area.dano
-
-
-
-
 
 func _on_timer_cd_timeout():
 	tiro_em_cd = false
