@@ -1,5 +1,5 @@
 extends Area2D
-
+#"<Freed Object>"
 @export var flecha_scene: PackedScene
 @export var vida_torre_max:int = 10
 @export var vida_torre:int = 10
@@ -11,36 +11,46 @@ var atacando:bool = false
 var array_inimigos:Array = []
 @export var tiro_em_cd:bool = false
 var last_enemy_pos: Vector2
-# Called when the node enters the scene tree for the first time.
+var angulo_flecha:float
+
+#ONREADY
 func _ready():
 	pass # Replace with function body.
 	$AnimatedSprite2D.play("1")
 	$AnimatedSprite2D/Arqueiro.play("idle")
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+#PROCESS
 func _process(delta):
-	if atacando:
-		$AnimatedSprite2D/Arqueiro.play("attack_left")
+	if atacando and $AnimatedSprite2D/Arqueiro.animation == "idle":
+		$AnimatedSprite2D/Arqueiro.play("attack_right")
+	elif !atacando and $AnimatedSprite2D/Arqueiro.animation == "attack_right":
+		$AnimatedSprite2D/Arqueiro.play("idle")
 	else:
 		$AnimatedSprite2D/Arqueiro.play("idle")
-	#printt("Array de inimigos: "+ str(array_inimigos))
 	if !array_inimigos.is_empty():
-		if str(array_inimigos[0]) == "<Freed Object>":
-			array_inimigos.remove_at(0)
-	
+		update_inimigos()
 	if !array_inimigos.is_empty():
-		atacando = true
-		last_enemy_pos = array_inimigos[0].position
-		if !tiro_em_cd:
+		if !tiro_em_cd and !str(array_inimigos[0]) == "<Freed Object>":
+			atacando = true
+			var alvo:Vector2 = array_inimigos[0].position
 			var flecha = flecha_scene.instantiate()
 			flecha.position = Vector2.ZERO
-			flecha.set_dir(last_enemy_pos, position)
+			angulo_flecha = position.angle_to(alvo)
+			#print(angulo_flecha)
+			flecha.set_dir(alvo, position, angulo_flecha)
 			add_child(flecha)
 			tiro_em_cd = true
 			$TimerCD.start()
-	else:
-		atacando = false
+		else:
+			atacando = false
 	
+	
+	
+#FUNCOES
+func update_inimigos():
+	if str( array_inimigos[0] ) == "<Freed Object>":
+		array_inimigos.remove_at(0)
+		
 func uparVida()->void:
 	vida_torre_max += 5
 	
@@ -54,8 +64,11 @@ func _on_range_area_entered(area):
 	array_inimigos.append(area)
 
 func _on_area_2d_hitbox_area_entered(area):
-	area.queue_free()
 	vida_torre -= area.dano
+	area.queue_free()
+	update_inimigos()
+	
 
 func _on_timer_cd_timeout():
 	tiro_em_cd = false
+	

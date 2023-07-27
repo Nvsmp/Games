@@ -24,7 +24,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0nbsu"]
-size = Vector2(14, 4)
+size = Vector2(3, 4)
 
 [node name="Area2D" type="Area2D"]
 collision_layer = 4
@@ -36,6 +36,7 @@ sprite_frames = SubResource("SpriteFrames_x74yx")
 animation = &"1"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(5.5, 0)
 shape = SubResource("RectangleShape2D_0nbsu")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]

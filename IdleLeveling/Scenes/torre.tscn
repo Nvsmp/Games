@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://yi2kd3qiselm"]
+[gd_scene load_steps=34 format=3 uid="uid://yi2kd3qiselm"]
 
 [ext_resource type="Script" path="res://Scripts/torre.gd" id="1_tn4qs"]
 [ext_resource type="PackedScene" uid="uid://b3d7kdrjw0d8j" path="res://Scenes/flecha.tscn" id="2_4ihsk"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://oq4ievt4frg0" path="res://Assets/torre/2 Idle/2.png" id="3_45mia"]
 [ext_resource type="Texture2D" uid="uid://dswwfp1nfotox" path="res://Assets/torre/3 Units/3/S_Attack.png" id="4_f1gdh"]
 [ext_resource type="Texture2D" uid="uid://bxhfunfw7nswe" path="res://Assets/torre/3 Units/3/S_Idle.png" id="5_icwv8"]
+[ext_resource type="Texture2D" uid="uid://dmg2nfy5jgaql" path="res://Assets/torre/3 Units/1/S_Attack.png" id="6_ww54s"]
 
 [sub_resource type="GDScript" id="GDScript_dst61"]
 script/source = "extends Area2D
@@ -93,6 +94,30 @@ region = Rect2(192, 0, 48, 48)
 atlas = ExtResource("4_f1gdh")
 region = Rect2(240, 0, 48, 48)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_qj5mn"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ug6x4"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pkx08"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pqajf"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_31q37"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(192, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p4pnx"]
+atlas = ExtResource("6_ww54s")
+region = Rect2(240, 0, 48, 48)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_iways"]
 atlas = ExtResource("5_icwv8")
 region = Rect2(0, 0, 48, 48)
@@ -133,6 +158,29 @@ animations = [{
 "loop": true,
 "name": &"attack_left",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qj5mn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ug6x4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pkx08")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pqajf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_31q37")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p4pnx")
+}],
+"loop": true,
+"name": &"attack_right",
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -197,17 +245,19 @@ position = Vector2(0, -21.5)
 scale = Vector2(0.9, 0.9)
 sprite_frames = SubResource("SpriteFrames_lug8k")
 animation = &"1"
-frame_progress = 0.377785
 
 [node name="Arqueiro" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
 position = Vector2(0, 18.3333)
 sprite_frames = SubResource("SpriteFrames_tu06l")
-animation = &"idle"
+animation = &"attack_right"
+frame_progress = 0.800897
+flip_h = true
 
 [node name="TimerRegenVida" type="Timer" parent="."]
 autostart = true
 
 [node name="TimerCD" type="Timer" parent="."]
+wait_time = 0.1
 
 [connection signal="area_entered" from="range" to="." method="_on_range_area_entered"]
 [connection signal="area_entered" from="area2d_hitbox" to="." method="_on_area_2d_hitbox_area_entered"]
